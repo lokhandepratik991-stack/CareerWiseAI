@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap, Upload } from 'lucide-react';
+import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap, Upload, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,10 +11,6 @@ import { performDeepAnalysis, type DeepAnalysisOutput } from '@/ai/flows/deep-an
 import type { AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-content-flow';
 import type { ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
 import type { GenerateCareerRecommendationsOutput } from '@/ai/flows/generate-career-recommendations';
-
-// PDF parsing imports - Using .mjs for v4+ compatibility
-import * as pdfjs from 'pdfjs-dist';
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface UploadSectionProps {
   onResults: (
@@ -47,6 +43,11 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
     setIsParsingPDF(true);
     try {
+      // Dynamic import of pdfjs-dist to avoid Node.js/SSR "legacy build" warnings
+      const pdfjs = await import('pdfjs-dist');
+      // Set worker source dynamically
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
       const pdf = await loadingTask.promise;
@@ -64,14 +65,14 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
       setResumeText(fullText.trim());
       toast({
-        title: "PDF Parsed",
-        description: "Successfully extracted text from your resume.",
+        title: "Intelligence Captured",
+        description: "Resume text extracted successfully. Proceed to analysis.",
       });
     } catch (error: any) {
       console.error("PDF Parsing error:", error);
       toast({
-        title: "Parsing failed",
-        description: "Could not extract text from this PDF. This might be due to security restrictions on the worker script. Please try pasting the text manually.",
+        title: "Extraction Failed",
+        description: "Could not parse this PDF. Please ensure it is not password protected or try pasting the text manually.",
         variant: "destructive",
       });
     } finally {
@@ -83,8 +84,8 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
   const handleAnalyze = async () => {
     if (!resumeText.trim()) {
       toast({
-        title: "Input required",
-        description: "Please paste your resume content or upload a PDF before initiating analysis.",
+        title: "Intelligence Gap",
+        description: "Please provide resume content via upload or text input.",
         variant: "destructive",
       });
       return;
@@ -96,7 +97,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
       const output = await performDeepAnalysis({ resumeText });
       
       if (!output) {
-        throw new Error("No output received from analysis engine.");
+        throw new Error("Intelligence engine yielded no results.");
       }
 
       if (onDeepResults) {
@@ -106,14 +107,14 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
       }
 
       toast({
-        title: "Intelligence scan complete",
-        description: "Your professional insights have been successfully generated.",
+        title: "Scan Successful",
+        description: "Neural career analysis complete.",
       });
     } catch (error: any) {
       console.error("Deep analysis failed", error);
       toast({
-        title: "Analysis failure",
-        description: error.message || "An error occurred during neural processing. Please verify your connection and try again.",
+        title: "Processing Error",
+        description: error.message || "The intelligence engine encountered an issue. Please try again shortly.",
         variant: "destructive",
       });
     } finally {
@@ -128,7 +129,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           Professional Neural Scan
         </h1>
         <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium">
-          Upload your PDF CV or paste your professional history for deep algorithmic analysis.
+          Upload your professional history for deep algorithmic analysis and strategic pathing.
         </p>
       </div>
 
@@ -146,7 +147,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
                 </CardDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -158,16 +159,16 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
                 variant="outline" 
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isParsingPDF || isAnalyzing}
-                className="rounded-full gap-2 text-xs font-bold uppercase tracking-widest border-slate-200 shadow-sm"
+                className="rounded-full gap-2 text-xs font-black uppercase tracking-widest border-slate-200 shadow-sm px-6 h-11"
               >
                 {isParsingPDF ? (
                   <>
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    Parsing PDF...
+                    Extracting...
                   </>
                 ) : (
                   <>
-                    <Upload className="h-3.5 w-3.5" />
+                    <FileUp className="h-3.5 w-3.5" />
                     Upload PDF
                   </>
                 )}
@@ -178,8 +179,8 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
         <CardContent className="p-8">
           <div className="relative group">
             <Textarea 
-              placeholder="Paste the full text of your resume or CV here, or upload a PDF using the button above..."
-              className="min-h-[450px] resize-none border-slate-200 focus-visible:ring-primary focus-visible:border-primary text-base p-8 bg-slate-50/30 rounded-2xl transition-all"
+              placeholder="Paste your resume content here, or use the 'Upload PDF' button to extract automatically..."
+              className="min-h-[400px] resize-none border-slate-200 focus-visible:ring-primary focus-visible:border-primary text-base p-8 bg-slate-50/30 rounded-2xl transition-all"
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
             />
@@ -189,13 +190,13 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
               </div>
             )}
           </div>
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-10">
             <Button 
               size="lg" 
               type="button"
               onClick={handleAnalyze} 
               disabled={isAnalyzing || !resumeText.trim()}
-              className="h-14 px-12 text-sm font-bold uppercase tracking-widest rounded-full shadow-xl shadow-primary/20 gap-3 transition-all hover:scale-[1.02]"
+              className="h-16 px-16 text-sm font-black uppercase tracking-[0.2em] rounded-full shadow-2xl shadow-primary/30 gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               {isAnalyzing ? (
                 <>
@@ -215,16 +216,16 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-reveal [animation-delay:200ms]">
         {[
-          { icon: Zap, title: "Efficiency", desc: "Proprietary text extraction bypasses formatting hurdles." },
-          { icon: BrainCircuit, title: "Precision", desc: "Multimodal LLM mapping identifies core competencies." },
-          { icon: Rocket, title: "Velocity", desc: "Accelerate your professional trajectory in minutes." }
+          { icon: Zap, title: "Efficiency", desc: "Proprietary text extraction bypasses complex formatting hurdles." },
+          { icon: BrainCircuit, title: "Precision", desc: "Multimodal mapping identifies core competencies and leadership signals." },
+          { icon: Rocket, title: "Velocity", desc: "Accelerate your professional trajectory with high-impact revision." }
         ].map((item, idx) => (
-          <div key={idx} className="p-8 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all space-y-4">
-            <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-              <item.icon className="h-5 w-5 text-primary" />
+          <div key={idx} className="p-8 rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all space-y-4 group">
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 transition-colors group-hover:bg-primary group-hover:text-white">
+              <item.icon className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-bold tracking-tight">{item.title}</h3>
-            <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+            <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
+            <p className="text-slate-500 text-sm leading-relaxed font-medium">{item.desc}</p>
           </div>
         ))}
       </div>

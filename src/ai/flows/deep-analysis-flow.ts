@@ -116,15 +116,15 @@ const deepAnalysisFlow = ai.defineFlow(
       
       // Handle quota issues (429)
       if (message.includes('429') || message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
-        throw new Error('Intelligence quota exceeded. Please wait about 60 seconds before trying again.');
+        throw new Error('Intelligence quota reached. Please wait about 60 seconds before re-scanning.');
       }
       
-      // Handle model not found (404) or configuration issues
+      // Handle model not found (404) or transient maintenance
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('The intelligence model is currently unavailable or undergoing maintenance. Please try again in a moment.');
+        throw new Error('Intelligence engine is currently undergoing maintenance. Please try again in a moment.');
       }
       
-      throw new Error(message || 'An unexpected error occurred during deep analysis.');
+      throw new Error(message || 'An unexpected error occurred during neural processing.');
     }
   }
 );
