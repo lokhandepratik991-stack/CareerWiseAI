@@ -1,0 +1,103 @@
+'use server';
+/**
+ * @fileOverview A unified Genkit flow that performs a complete, deep analysis of a resume in a single pass.
+ * This combines data extraction, feedback generation, and career recommendations to minimize latency.
+ */
+
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+
+// Re-using existing schemas for consistency with the UI
+const AnalyzeResumeContentOutputSchema = z.object({
+  skills: z.array(z.string()).describe('A list of key skills extracted from the resume.'),
+  experience: z.array(z.object({
+    jobTitle: z.string().describe('The title of the job role.'),
+    company: z.string().describe('The company name.'),
+    duration: z.string().describe('The duration of the role.'),
+    summary: z.string().describe('A brief summary of responsibilities and achievements.'),
+  })),
+  education: z.array(z.object({
+    degree: z.string().describe('The degree obtained.'),
+    fieldOfStudy: z.string().describe('The field of study.'),
+    institution: z.string().describe('The name of the institution.'),
+    graduationDate: z.string().describe('The graduation date.'),
+  })),
+  overallSummary: z.string().describe('A concise professional summary.'),
+});
+
+const ResumeFeedbackReportOutputSchema = z.object({
+  overallSummary: z.string().describe('Overall effectiveness of the resume.'),
+  strengths: z.array(z.object({
+    title: z.string().describe('Brief title for the strength.'),
+    description: z.string().describe('Detailed explanation.'),
+  })),
+  weaknesses: z.array(z.object({
+    title: z.string().describe('Brief title for the weakness.'),
+    description: z.string().describe('Detailed explanation.'),
+  })),
+  suggestions: z.array(z.object({
+    title: z.string().describe('Brief title for the suggestion.'),
+    description: z.string().describe('Actionable advice.'),
+  })),
+});
+
+const CareerRecommendationsOutputSchema = z.object({
+  careerPaths: z.array(z.object({
+    name: z.string().describe('Name of the career path.'),
+    description: z.string().describe('Why it is suitable.'),
+    growthOpportunities: z.array(z.string()),
+  })),
+  jobRoleRecommendations: z.array(z.object({
+    title: z.string().describe('Recommended job title.'),
+    description: z.string().describe('Brief job description.'),
+    relevantSkills: z.array(z.string()),
+    keywords: z.array(z.string()),
+  })),
+});
+
+const DeepAnalysisInputSchema = z.object({
+  resumeText: z.string().describe('The full text content of the resume.'),
+});
+export type DeepAnalysisInput = z.infer<typeof DeepAnalysisInputSchema>;
+
+const DeepAnalysisOutputSchema = z.object({
+  analysis: AnalyzeResumeContentOutputSchema,
+  feedback: ResumeFeedbackReportOutputSchema,
+  career: CareerRecommendationsOutputSchema,
+});
+export type DeepAnalysisOutput = z.infer<typeof DeepAnalysisOutputSchema>;
+
+export async function performDeepAnalysis(input: DeepAnalysisInput): Promise<DeepAnalysisOutput> {
+  return deepAnalysisFlow(input);
+}
+
+const deepAnalysisPrompt = ai.definePrompt({
+  name: 'deepAnalysisPrompt',
+  input: { schema: DeepAnalysisInputSchema },
+  output: { schema: DeepAnalysisOutputSchema },
+  prompt: `You are an elite career intelligence system. Perform a comprehensive multidimensional analysis of the provided resume text.
+
+Resume Text:
+"""
+{{{resumeText}}}
+"""
+
+Your response must include:
+1. **Structural Extraction (analysis)**: Extract skills, experience, and education into the requested format.
+2. **Executive Audit (feedback)**: Provide objective strengths, weaknesses, and strategic suggestions for the resume's effectiveness.
+3. **Strategic Pathing (career)**: Recommend 2-3 career paths and 3-5 specific job roles based on the candidate's profile.
+
+Be precise, encouraging, and professional. Ensure all fields are populated with high-quality, actionable insights.`,
+});
+
+const deepAnalysisFlow = ai.defineFlow(
+  {
+    name: 'deepAnalysisFlow',
+    inputSchema: DeepAnalysisInputSchema,
+    outputSchema: DeepAnalysisOutputSchema,
+  },
+  async (input) => {
+    const { output } = await deepAnalysisPrompt(input);
+    return output!;
+  }
+);

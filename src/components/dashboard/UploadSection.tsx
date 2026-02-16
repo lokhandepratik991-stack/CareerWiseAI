@@ -5,9 +5,10 @@ import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { analyzeResumeContent, type AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-content-flow';
-import { generateResumeFeedbackReport, type ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
-import { generateCareerRecommendations, type GenerateCareerRecommendationsOutput } from '@/ai/flows/generate-career-recommendations';
+import { performDeepAnalysis } from '@/ai/flows/deep-analysis-flow';
+import type { AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-content-flow';
+import type { ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
+import type { GenerateCareerRecommendationsOutput } from '@/ai/flows/generate-career-recommendations';
 
 interface UploadSectionProps {
   onResults: (
@@ -26,28 +27,11 @@ export function UploadSection({ onResults }: UploadSectionProps) {
 
     setIsAnalyzing(true);
     try {
-      const analysis = await analyzeResumeContent({ resumeText });
-      
-      const feedback = await generateResumeFeedbackReport({
-        resumeText,
-        extractedKeywords: analysis.skills,
-        extractedExperienceSummary: analysis.experience.map(e => `${e.jobTitle} at ${e.company}`),
-        extractedEducationSummary: analysis.education.map(ed => `${ed.degree} from ${ed.institution}`),
-      });
-
-      const career = await generateCareerRecommendations({
-        resumeAnalysisReport: {
-          strengths: feedback.strengths.map(s => s.title).join(', '),
-          weaknesses: feedback.weaknesses.map(w => w.title).join(', '),
-          extractedJobTitles: analysis.experience.map(e => e.jobTitle),
-          extractedSkills: analysis.skills,
-          experienceSummary: analysis.overallSummary
-        }
-      });
-
+      // Perform a single unified analysis flow for maximum speed
+      const { analysis, feedback, career } = await performDeepAnalysis({ resumeText });
       onResults(analysis, feedback, career);
     } catch (error) {
-      console.error("Analysis failed", error);
+      console.error("Deep analysis failed", error);
     } finally {
       setIsAnalyzing(false);
     }
