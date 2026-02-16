@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState } from 'react';
-import { FileText, Upload, Loader2, Sparkles } from 'lucide-react';
+import { FileText, Upload, Loader2, Sparkles, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
