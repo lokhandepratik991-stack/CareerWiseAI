@@ -5,7 +5,7 @@ import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { performDeepAnalysis } from '@/ai/flows/deep-analysis-flow';
+import { performDeepAnalysis, type DeepAnalysisOutput } from '@/ai/flows/deep-analysis-flow';
 import type { AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-content-flow';
 import type { ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
 import type { GenerateCareerRecommendationsOutput } from '@/ai/flows/generate-career-recommendations';
@@ -16,9 +16,10 @@ interface UploadSectionProps {
     feedback: ResumeFeedbackReportOutput,
     career: GenerateCareerRecommendationsOutput
   ) => void;
+  onDeepResults?: (output: DeepAnalysisOutput) => void;
 }
 
-export function UploadSection({ onResults }: UploadSectionProps) {
+export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) {
   const [resumeText, setResumeText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -28,8 +29,12 @@ export function UploadSection({ onResults }: UploadSectionProps) {
     setIsAnalyzing(true);
     try {
       // Perform a single unified analysis flow for maximum speed
-      const { analysis, feedback, career } = await performDeepAnalysis({ resumeText });
-      onResults(analysis, feedback, career);
+      const output = await performDeepAnalysis({ resumeText });
+      if (onDeepResults) {
+        onDeepResults(output);
+      } else {
+        onResults(output.analysis, output.feedback, output.career);
+      }
     } catch (error) {
       console.error("Deep analysis failed", error);
     } finally {

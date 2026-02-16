@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview A unified Genkit flow that performs a complete, deep analysis of a resume in a single pass.
- * This combines data extraction, feedback generation, and career recommendations to minimize latency.
+ * This includes a professionally revised version of the resume for export.
  */
 
 import { ai } from '@/ai/genkit';
@@ -64,6 +64,7 @@ const DeepAnalysisOutputSchema = z.object({
   analysis: AnalyzeResumeContentOutputSchema,
   feedback: ResumeFeedbackReportOutputSchema,
   career: CareerRecommendationsOutputSchema,
+  revisedResumeMarkdown: z.string().describe('A complete, professionally rewritten version of the resume in Markdown format, optimized for ATS and readability.'),
 });
 export type DeepAnalysisOutput = z.infer<typeof DeepAnalysisOutputSchema>;
 
@@ -84,8 +85,13 @@ Resume Text:
 
 Your response must include:
 1. **Structural Extraction (analysis)**: Extract skills, experience, and education into the requested format.
-2. **Executive Audit (feedback)**: Provide objective strengths, weaknesses, and strategic suggestions for the resume's effectiveness.
-3. **Strategic Pathing (career)**: Recommend 2-3 career paths and 3-5 specific job roles based on the candidate's profile.
+2. **Executive Audit (feedback)**: Provide objective strengths, weaknesses, and strategic suggestions.
+3. **Strategic Pathing (career)**: Recommend career paths and specific job roles.
+4. **Optimized Revision (revisedResumeMarkdown)**: Rewrite the entire resume into a professional, high-impact Markdown format. 
+   - Use standard Markdown headers (H1 for name, H2 for sections).
+   - Use bullet points for achievements.
+   - Use action verbs and quantify results.
+   - Ensure the structure is clean: Contact (placeholder), Summary, Skills, Experience, Education.
 
 Be precise, encouraging, and professional. Ensure all fields are populated with high-quality, actionable insights.`,
 });
