@@ -42,10 +42,8 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
     setIsParsingPDF(true);
     try {
-      // Use dynamic import for the browser-only PDF library
       const pdfjs = await import('pdfjs-dist');
-      
-      // Configure worker from a reliable CDN that matches the library version
+      // Use the stable mjs worker URL
       const workerUrl = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
       pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 

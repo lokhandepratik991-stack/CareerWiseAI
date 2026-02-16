@@ -6,5 +6,4 @@ export const ai = genkit({
 });
 
 // Use the standard stable model for analysis.
-// This identifier is the most reliable for the Google AI plugin.
 export const defaultModel = 'googleai/gemini-1.5-flash';
