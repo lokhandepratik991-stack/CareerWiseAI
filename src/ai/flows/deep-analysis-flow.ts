@@ -111,17 +111,16 @@ const deepAnalysisFlow = ai.defineFlow(
       }
       return output;
     } catch (error: any) {
-      console.error('Deep Analysis Flow error:', error);
       const message = error.message || '';
       
-      // Handle quota issues
+      // Handle quota issues (429)
       if (message.includes('429') || message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
-        throw new Error('Intelligence quota exceeded. Please wait a moment before trying again.');
+        throw new Error('AI Quota exceeded. Please wait about 60 seconds before trying again.');
       }
       
-      // Handle model not found (configuration issues)
+      // Handle model not found (404)
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('The intelligence model is currently unavailable or undergoing maintenance. Please try again in a moment.');
+        throw new Error('The intelligence model configuration is being updated. Please try again in a moment.');
       }
       
       throw new Error(message || 'An unexpected error occurred during analysis.');
