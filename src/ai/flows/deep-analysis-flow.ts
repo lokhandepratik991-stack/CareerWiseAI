@@ -1,13 +1,11 @@
 'use server';
 /**
  * @fileOverview A unified Genkit flow that performs a complete, deep analysis of a resume in a single pass.
- * This includes a professionally revised version of the resume for export.
  */
 
 import { ai, defaultModel } from '@/ai/genkit';
 import { z } from 'genkit';
 
-// Re-using existing schemas for consistency with the UI
 const AnalyzeResumeContentOutputSchema = z.object({
   skills: z.array(z.string()).describe('A list of key skills extracted from the resume.'),
   experience: z.array(z.object({
@@ -64,7 +62,7 @@ const DeepAnalysisOutputSchema = z.object({
   analysis: AnalyzeResumeContentOutputSchema,
   feedback: ResumeFeedbackReportOutputSchema,
   career: CareerRecommendationsOutputSchema,
-  revisedResumeMarkdown: z.string().describe('A complete, professionally rewritten version of the resume in Markdown format, optimized for ATS and readability.'),
+  revisedResumeMarkdown: z.string().describe('A complete, professionally rewritten version of the resume in Markdown format.'),
 });
 export type DeepAnalysisOutput = z.infer<typeof DeepAnalysisOutputSchema>;
 
@@ -77,24 +75,14 @@ const deepAnalysisPrompt = ai.definePrompt({
   model: defaultModel,
   input: { schema: DeepAnalysisInputSchema },
   output: { schema: DeepAnalysisOutputSchema },
-  prompt: `You are an elite career intelligence system. Perform a comprehensive multidimensional analysis of the provided resume text.
+  prompt: `You are an elite career intelligence system. Perform a comprehensive analysis of the provided resume text.
 
 Resume Text:
 """
 {{{resumeText}}}
 """
 
-Your response must include:
-1. **Structural Extraction (analysis)**: Extract skills, experience, and education into the requested format.
-2. **Executive Audit (feedback)**: Provide objective strengths, weaknesses, and strategic suggestions.
-3. **Strategic Pathing (career)**: Recommend career paths and specific job roles.
-4. **Optimized Revision (revisedResumeMarkdown)**: Rewrite the entire resume into a professional, high-impact Markdown format. 
-   - Use standard Markdown headers (H1 for name, H2 for sections).
-   - Use bullet points for achievements.
-   - Use action verbs and quantify results.
-   - Ensure the structure is clean: Contact (placeholder), Summary, Skills, Experience, Education.
-
-Be precise, encouraging, and professional. Ensure all fields are populated with high-quality, actionable insights.`,
+Your response must include structural extraction, an executive audit, strategic career recommendations, and a professional Markdown revision. Be precise and professional.`,
 });
 
 const deepAnalysisFlow = ai.defineFlow(
@@ -107,24 +95,22 @@ const deepAnalysisFlow = ai.defineFlow(
     try {
       const { output } = await deepAnalysisPrompt(input);
       if (!output) {
-        throw new Error('Intelligence engine failed to generate response content.');
+        throw new Error('Intelligence engine failed to generate content.');
       }
       return output;
     } catch (error: any) {
       console.error("Genkit Flow Error:", error);
       const message = error.message || '';
       
-      // Handle quota issues (429)
       if (message.includes('429') || message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
-        throw new Error('Intelligence quota reached. Please wait about 60 seconds before re-scanning.');
+        throw new Error('Intelligence quota reached. Please wait about 60 seconds.');
       }
       
-      // Handle model not found (404) or transient maintenance
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('The intelligence model is currently undergoing maintenance or is incorrectly configured. Please try again in a moment.');
+        throw new Error('Intelligence model configuration issue. Standardizing connection...');
       }
       
-      throw new Error(message || 'An unexpected error occurred during neural processing.');
+      throw new Error(message || 'An unexpected error occurred during analysis.');
     }
   }
 );

@@ -42,9 +42,9 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
     setIsParsingPDF(true);
     try {
-      // Dynamic import to avoid Node.js build issues
       const pdfjs = await import('pdfjs-dist');
-      pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+      // Use the correct .mjs worker path for latest pdf.js
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
@@ -63,14 +63,14 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
       setResumeText(fullText.trim());
       toast({
-        title: "Intelligence Captured",
-        description: "Resume text extracted successfully. Proceed to analysis.",
+        title: "Extraction Successful",
+        description: "Resume content captured. You can now execute the scan.",
       });
     } catch (error: any) {
       console.error("PDF Parsing error:", error);
       toast({
         title: "Extraction Failed",
-        description: "Could not parse this PDF. Please ensure it is not protected or try pasting the text manually.",
+        description: "Failed to parse PDF. Please try pasting manual text.",
         variant: "destructive",
       });
     } finally {
@@ -82,37 +82,30 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
   const handleAnalyze = async () => {
     if (!resumeText.trim()) {
       toast({
-        title: "Intelligence Gap",
-        description: "Please provide resume content via upload or text input.",
+        title: "Input Required",
+        description: "Please upload a PDF or paste your resume content.",
         variant: "destructive",
       });
       return;
     }
 
     setIsAnalyzing(true);
-    
     try {
       const output = await performDeepAnalysis({ resumeText });
-      
-      if (!output) {
-        throw new Error("Intelligence engine yielded no results.");
-      }
-
       if (onDeepResults) {
         onDeepResults(output);
       } else {
         onResults(output.analysis, output.feedback, output.career);
       }
-
       toast({
         title: "Scan Successful",
         description: "Neural career analysis complete.",
       });
     } catch (error: any) {
-      console.error("Deep analysis failed", error);
+      console.error("Analysis failed", error);
       toast({
         title: "Processing Error",
-        description: error.message || "The intelligence engine encountered an issue. Please try again shortly.",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -127,11 +120,11 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           Professional Neural Scan
         </h1>
         <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium">
-          Upload your professional history for deep algorithmic analysis and strategic pathing.
+          Upload your professional history for deep algorithmic analysis.
         </p>
       </div>
 
-      <Card className="border border-slate-200 bg-white shadow-2xl rounded-[2rem] overflow-hidden animate-reveal [animation-delay:100ms]">
+      <Card className="border border-slate-200 bg-white shadow-2xl rounded-[2rem] overflow-hidden animate-reveal">
         <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -141,7 +134,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
               <div>
                 <CardTitle className="text-xl font-bold tracking-tight">Intelligence Input</CardTitle>
                 <CardDescription className="text-sm font-medium text-slate-500 mt-1">
-                  Raw text extraction for multidimensional processing.
+                  Upload a PDF or paste text manually.
                 </CardDescription>
               </div>
             </div>
@@ -160,67 +153,35 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
                 className="rounded-full gap-2 text-xs font-black uppercase tracking-widest border-slate-200 shadow-sm px-6 h-11"
               >
                 {isParsingPDF ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    Extracting...
-                  </>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <>
-                    <FileUp className="h-3.5 w-3.5" />
-                    Upload PDF
-                  </>
+                  <FileUp className="h-3.5 w-3.5" />
                 )}
+                Upload PDF
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-8">
-          <div className="relative group">
+          <div className="relative">
             <Textarea 
               placeholder="Paste your resume content here..."
-              className="min-h-[450px] resize-none border-slate-200 focus-visible:ring-primary focus-visible:border-primary text-base p-8 bg-slate-50/30 rounded-2xl transition-all"
+              className="min-h-[400px] resize-none border-slate-200 focus-visible:ring-primary text-base p-8 bg-slate-50/30 rounded-2xl"
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
             />
-            {!resumeText.trim() && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-8">
-                <div className="bg-white/80 backdrop-blur-md p-10 rounded-[2rem] border border-dashed border-slate-300 flex flex-col items-center gap-6 pointer-events-auto shadow-sm">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <FileUp className="h-8 w-8" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="text-xl font-bold text-slate-900">Choose your input method</p>
-                    <p className="text-sm text-slate-500 font-medium">Upload a PDF for automatic extraction or start typing</p>
-                  </div>
-                  <div className="flex items-center gap-4 w-full px-4">
-                    <div className="h-px bg-slate-200 flex-1" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">OR</span>
-                    <div className="h-px bg-slate-200 flex-1" />
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    className="gap-2 text-xs font-black uppercase tracking-widest text-primary hover:bg-primary/5 rounded-full px-8"
-                    onClick={() => document.querySelector('textarea')?.focus()}
-                  >
-                    <MousePointer2 className="h-3.5 w-3.5" />
-                    Paste Manual Text
-                  </Button>
-                </div>
-              </div>
-            )}
           </div>
           <div className="flex justify-center mt-10">
             <Button 
               size="lg" 
-              type="button"
               onClick={handleAnalyze} 
               disabled={isAnalyzing || !resumeText.trim()}
-              className="h-16 px-16 text-sm font-black uppercase tracking-[0.2em] rounded-full shadow-2xl shadow-primary/30 gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="h-16 px-16 text-sm font-black uppercase tracking-widest rounded-full shadow-2xl shadow-primary/30 gap-3 transition-all hover:scale-[1.02]"
             >
               {isAnalyzing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Neural Processing...
+                  Processing...
                 </>
               ) : (
                 <>
@@ -232,22 +193,6 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           </div>
         </CardContent>
       </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-reveal [animation-delay:200ms]">
-        {[
-          { icon: Zap, title: "Efficiency", desc: "Proprietary text extraction bypasses complex formatting hurdles." },
-          { icon: BrainCircuit, title: "Precision", desc: "Multimodal mapping identifies core competencies and leadership signals." },
-          { icon: Rocket, title: "Velocity", desc: "Accelerate your professional trajectory with high-impact revision." }
-        ].map((item, idx) => (
-          <div key={idx} className="p-8 rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all space-y-4 group">
-            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 transition-colors group-hover:bg-primary group-hover:text-white">
-              <item.icon className="h-6 w-6" />
-            </div>
-            <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
-            <p className="text-slate-500 text-sm leading-relaxed font-medium">{item.desc}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

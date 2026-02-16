@@ -5,5 +5,5 @@ export const ai = genkit({
   plugins: [googleAI()],
 });
 
-// Standard stable model identifier for enterprise-grade analysis
+// Use the standard stable model for analysis
 export const defaultModel = 'googleai/gemini-1.5-flash';
