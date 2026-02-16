@@ -2,15 +2,15 @@
   "placeholderImages": [
     {
       "id": "hero-bg",
-      "description": "Professional team working in a modern office",
-      "imageUrl": "https://images.unsplash.com/photo-1560264280-88b68371db39?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxvZmZpY2UlMjB0ZWFtfGVufDB8fHx8MTc3MTIxNzU1Nnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "office team"
+      "description": "Minimalist high-end executive boardroom with floor-to-ceiling windows",
+      "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBvZmZpY2V8ZW58MHx8fHwxNzczNzY2NDM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern office"
     },
     {
       "id": "resume-analysis",
-      "description": "Abstract visualization of data and document analysis",
-      "imageUrl": "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxkYXRhJTIwYW5hbHlzaXN8ZW58MHx8fHwxNzcxMTQzNDQ1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "data analysis"
+      "description": "Close up of high-tech digital interface showing data visualization",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bbbda536339a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxkYXRhJTIwdmlzdWFsaXphdGlvbnxlbn|MHx8fHwxNzczNzY2NDM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "data visualization"
     }
   ]
 }

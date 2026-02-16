@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState } from 'react';
-import { FileText, Upload, Loader2, Sparkles, Rocket, BrainCircuit } from 'lucide-react';
+import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,58 +54,60 @@ export function UploadSection({ onResults }: UploadSectionProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 py-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-black font-headline tracking-tighter text-primary">
-          Deep Resume Scan
+    <div className="max-w-5xl mx-auto space-y-16 py-12">
+      <div className="text-center space-y-4 animate-reveal">
+        <h1 className="text-5xl font-extrabold tracking-tighter text-slate-900">
+          Professional Neural Scan
         </h1>
-        <p className="text-muted-foreground text-lg max-w-xl mx-auto font-medium">
-          Our neural engine will dissect your resume and uncover your true professional potential.
+        <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium">
+          Upload your professional history for deep algorithmic analysis and strategic pathing.
         </p>
       </div>
 
-      <Card className="border-2 border-dashed border-primary/30 bg-white/50 backdrop-blur-sm shadow-2xl rounded-[2.5rem] overflow-hidden group hover:border-primary transition-all duration-500">
-        <CardHeader className="bg-primary/5 pb-10">
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="bg-primary p-2 rounded-xl text-white">
-              <BrainCircuit className="h-6 w-6" />
+      <Card className="border border-slate-200 bg-white shadow-2xl rounded-[2rem] overflow-hidden animate-reveal [animation-delay:100ms]">
+        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-slate-900 p-2 rounded-lg text-white">
+              <BrainCircuit className="h-5 w-5" />
             </div>
-            Resume Content Engine
-          </CardTitle>
-          <CardDescription className="text-base">
-            Copy and paste your full resume text. Our AI ignores formatting and focuses purely on your value.
-          </CardDescription>
+            <div>
+              <CardTitle className="text-xl font-bold tracking-tight">Intelligence Input</CardTitle>
+              <CardDescription className="text-sm font-medium text-slate-500 mt-1">
+                Raw text extraction for multidimensional processing.
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="p-8 pt-0 -mt-6">
-          <div className="relative">
+        <CardContent className="p-8">
+          <div className="relative group">
             <Textarea 
-              placeholder="Paste your professional narrative here..."
-              className="min-h-[400px] resize-none border-2 border-transparent focus-visible:ring-primary/50 text-lg p-6 bg-white rounded-3xl shadow-inner transition-all duration-300"
+              placeholder="Paste the full text of your resume or CV here..."
+              className="min-h-[450px] resize-none border-slate-200 focus-visible:ring-primary focus-visible:border-primary text-base p-8 bg-slate-50/30 rounded-2xl transition-all"
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
             />
             {!resumeText.trim() && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 group-hover:opacity-40 transition-opacity">
-                <FileText className="h-32 w-32 text-primary" />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                <FileText className="h-48 w-48 text-slate-900" />
               </div>
             )}
           </div>
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-center mt-8">
             <Button 
               size="lg" 
               onClick={handleAnalyze} 
               disabled={isAnalyzing || !resumeText.trim()}
-              className="h-16 px-16 text-xl rounded-full shadow-2xl shadow-primary/40 gap-3 bg-gradient-to-r from-primary to-purple-600 border-none hover:scale-105 transition-all duration-300"
+              className="h-14 px-12 text-sm font-bold uppercase tracking-widest rounded-full shadow-xl shadow-primary/20 gap-3 transition-all hover:scale-[1.02]"
             >
               {isAnalyzing ? (
                 <>
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  Processing Intelligence...
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Neural Processing...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-6 w-6" />
-                  Generate AI Report
+                  <Sparkles className="h-4 w-4" />
+                  Execute Analysis
                 </>
               )}
             </Button>
@@ -114,28 +115,20 @@ export function UploadSection({ onResults }: UploadSectionProps) {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="p-8 rounded-3xl bg-white border shadow-lg hover:shadow-xl transition-all duration-300 space-y-4 group">
-          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-            <Upload className="h-7 w-7 text-primary group-hover:text-white" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-reveal [animation-delay:200ms]">
+        {[
+          { icon: Zap, title: "Efficiency", desc: "Proprietary text extraction bypasses formatting hurdles." },
+          { icon: BrainCircuit, title: "Precision", desc: "Multimodal LLM mapping identifies core competencies." },
+          { icon: Rocket, title: "Velocity", desc: "Accelerate your professional trajectory in minutes." }
+        ].map((item, idx) => (
+          <div key={idx} className="p-8 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all space-y-4">
+            <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
+              <item.icon className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="text-lg font-bold tracking-tight">{item.title}</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
           </div>
-          <h3 className="text-xl font-bold">1. Zero Friction</h3>
-          <p className="text-muted-foreground leading-relaxed">No complex file uploads. Just text. Clean and efficient.</p>
-        </div>
-        <div className="p-8 rounded-3xl bg-white border shadow-lg hover:shadow-xl transition-all duration-300 space-y-4 group">
-          <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-all">
-            <BrainCircuit className="h-7 w-7 text-secondary group-hover:text-white" />
-          </div>
-          <h3 className="text-xl font-bold">2. Smart Parse</h3>
-          <p className="text-muted-foreground leading-relaxed">Multimodal LLM extraction identifies every relevant skill and milestone.</p>
-        </div>
-        <div className="p-8 rounded-3xl bg-white border shadow-lg hover:shadow-xl transition-all duration-300 space-y-4 group">
-          <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
-            <Rocket className="h-7 w-7 text-purple-600 group-hover:text-white" />
-          </div>
-          <h3 className="text-xl font-bold">3. Launch Pad</h3>
-          <p className="text-muted-foreground leading-relaxed">Instant career pathing based on your unique profile data.</p>
-        </div>
+        ))}
       </div>
     </div>
   );
