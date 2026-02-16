@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A unified Genkit flow that performs a complete, deep analysis of a resume in a single pass.
@@ -112,6 +111,7 @@ const deepAnalysisFlow = ai.defineFlow(
       }
       return output;
     } catch (error: any) {
+      console.error("Genkit Flow Error:", error);
       const message = error.message || '';
       
       // Handle quota issues (429)
@@ -121,7 +121,7 @@ const deepAnalysisFlow = ai.defineFlow(
       
       // Handle model not found (404) or transient maintenance
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('Intelligence engine is currently undergoing maintenance. Please try again in a moment.');
+        throw new Error('The intelligence model is currently undergoing maintenance or is incorrectly configured. Please try again in a moment.');
       }
       
       throw new Error(message || 'An unexpected error occurred during neural processing.');

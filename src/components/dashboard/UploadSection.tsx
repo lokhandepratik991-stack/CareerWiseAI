@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState, useRef } from 'react';
-import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap, Upload, FileUp } from 'lucide-react';
+import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap, Upload, FileUp, MousePointer2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,10 +42,9 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
     setIsParsingPDF(true);
     try {
-      // Dynamic import of pdfjs-dist to avoid Node.js/SSR "legacy build" warnings
+      // Dynamic import to avoid Node.js build issues
       const pdfjs = await import('pdfjs-dist');
-      // Set worker source dynamically
-      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
@@ -72,7 +70,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
       console.error("PDF Parsing error:", error);
       toast({
         title: "Extraction Failed",
-        description: "Could not parse this PDF. Please ensure it is not password protected or try pasting the text manually.",
+        description: "Could not parse this PDF. Please ensure it is not protected or try pasting the text manually.",
         variant: "destructive",
       });
     } finally {
@@ -179,14 +177,35 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
         <CardContent className="p-8">
           <div className="relative group">
             <Textarea 
-              placeholder="Paste your resume content here, or use the 'Upload PDF' button to extract automatically..."
-              className="min-h-[400px] resize-none border-slate-200 focus-visible:ring-primary focus-visible:border-primary text-base p-8 bg-slate-50/30 rounded-2xl transition-all"
+              placeholder="Paste your resume content here..."
+              className="min-h-[450px] resize-none border-slate-200 focus-visible:ring-primary focus-visible:border-primary text-base p-8 bg-slate-50/30 rounded-2xl transition-all"
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
             />
             {!resumeText.trim() && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                <FileText className="h-48 w-48 text-slate-900" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-8">
+                <div className="bg-white/80 backdrop-blur-md p-10 rounded-[2rem] border border-dashed border-slate-300 flex flex-col items-center gap-6 pointer-events-auto shadow-sm">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <FileUp className="h-8 w-8" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-xl font-bold text-slate-900">Choose your input method</p>
+                    <p className="text-sm text-slate-500 font-medium">Upload a PDF for automatic extraction or start typing</p>
+                  </div>
+                  <div className="flex items-center gap-4 w-full px-4">
+                    <div className="h-px bg-slate-200 flex-1" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">OR</span>
+                    <div className="h-px bg-slate-200 flex-1" />
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="gap-2 text-xs font-black uppercase tracking-widest text-primary hover:bg-primary/5 rounded-full px-8"
+                    onClick={() => document.querySelector('textarea')?.focus()}
+                  >
+                    <MousePointer2 className="h-3.5 w-3.5" />
+                    Paste Manual Text
+                  </Button>
+                </div>
               </div>
             )}
           </div>
