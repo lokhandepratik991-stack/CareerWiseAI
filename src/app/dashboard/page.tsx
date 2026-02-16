@@ -10,7 +10,7 @@ import { CareerSection } from '@/components/dashboard/CareerSection';
 import { AdviceSection } from '@/components/dashboard/AdviceSection';
 import { JobMatches } from '@/components/dashboard/JobMatches';
 import { Button } from '@/components/ui/button';
-import { FileText, TrendingUp, Lightbulb, Briefcase, ChevronLeft, Download, Share2 } from 'lucide-react';
+import { FileText, TrendingUp, Lightbulb, Briefcase, ChevronLeft, Download } from 'lucide-react';
 import type { AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-content-flow';
 import type { ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
 import type { GenerateCareerRecommendationsOutput } from '@/ai/flows/generate-career-recommendations';
@@ -80,10 +80,6 @@ function DashboardContent() {
                 <Button variant="outline" size="sm" onClick={() => window.print()} className="rounded-full gap-2 px-6 text-xs font-bold border-slate-200 shadow-sm">
                   <Download className="h-3.5 w-3.5" />
                   Export
-                </Button>
-                <Button size="sm" className="rounded-full gap-2 px-6 text-xs font-bold shadow-lg shadow-primary/20">
-                  <Share2 className="h-3.5 w-3.5" />
-                  Distribute
                 </Button>
               </div>
             </div>
