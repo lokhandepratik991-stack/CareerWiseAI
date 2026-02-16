@@ -109,9 +109,12 @@ const deepAnalysisFlow = ai.defineFlow(
         throw new Error('Intelligence engine failed to generate response content.');
       }
       return output;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Deep Analysis Flow error:', error);
-      throw error;
+      if (error.message?.includes('429') || error.message?.includes('quota')) {
+        throw new Error('Intelligence quota exceeded. Please wait a few seconds before trying again.');
+      }
+      throw new Error(error.message || 'An unexpected error occurred during analysis.');
     }
   }
 );
