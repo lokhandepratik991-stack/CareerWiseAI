@@ -99,7 +99,7 @@ const deepAnalysisFlow = ai.defineFlow(
       }
       return output;
     } catch (error: any) {
-      console.error("Genkit Error:", error);
+      console.error("Deep Analysis Engine Error:", error);
       const message = error.message || '';
       
       // Handle quota issues (429)
@@ -107,7 +107,7 @@ const deepAnalysisFlow = ai.defineFlow(
         throw new Error('Intelligence quota reached. Please wait about 60 seconds before trying again.');
       }
       
-      // Handle model not found (404)
+      // Handle model not found or configuration issues (404)
       if (message.includes('404') || message.includes('not found')) {
         throw new Error('The intelligence model is temporarily unavailable or misconfigured. Please check your API key and try again.');
       }
