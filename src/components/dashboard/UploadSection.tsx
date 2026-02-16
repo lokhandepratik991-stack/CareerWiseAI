@@ -5,6 +5,7 @@ import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from "@/hooks/use-toast";
 import { performDeepAnalysis, type DeepAnalysisOutput } from '@/ai/flows/deep-analysis-flow';
 import type { AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-content-flow';
 import type { ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
@@ -22,21 +23,44 @@ interface UploadSectionProps {
 export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) {
   const [resumeText, setResumeText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { toast } = useToast();
 
   const handleAnalyze = async () => {
-    if (!resumeText.trim()) return;
+    if (!resumeText.trim()) {
+      toast({
+        title: "Input required",
+        description: "Please paste your resume content before initiating analysis.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsAnalyzing(true);
+    
     try {
-      // Perform a single unified analysis flow for maximum speed
       const output = await performDeepAnalysis({ resumeText });
+      
+      if (!output) {
+        throw new Error("No output received from analysis engine.");
+      }
+
       if (onDeepResults) {
         onDeepResults(output);
       } else {
         onResults(output.analysis, output.feedback, output.career);
       }
+
+      toast({
+        title: "Intelligence scan complete",
+        description: "Your professional insights have been successfully generated.",
+      });
     } catch (error) {
       console.error("Deep analysis failed", error);
+      toast({
+        title: "Analysis failure",
+        description: "An error occurred during neural processing. Please verify your connection and try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -84,6 +108,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           <div className="flex justify-center mt-8">
             <Button 
               size="lg" 
+              type="button"
               onClick={handleAnalyze} 
               disabled={isAnalyzing || !resumeText.trim()}
               className="h-14 px-12 text-sm font-bold uppercase tracking-widest rounded-full shadow-xl shadow-primary/20 gap-3 transition-all hover:scale-[1.02]"

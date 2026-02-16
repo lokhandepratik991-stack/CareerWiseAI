@@ -103,7 +103,15 @@ const deepAnalysisFlow = ai.defineFlow(
     outputSchema: DeepAnalysisOutputSchema,
   },
   async (input) => {
-    const { output } = await deepAnalysisPrompt(input);
-    return output!;
+    try {
+      const { output } = await deepAnalysisPrompt(input);
+      if (!output) {
+        throw new Error('Intelligence engine failed to generate response content.');
+      }
+      return output;
+    } catch (error) {
+      console.error('Deep Analysis Flow error:', error);
+      throw error;
+    }
   }
 );
