@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Briefcase, Rocket } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function Header() {
@@ -27,9 +27,6 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard">Log in</Link>
-          </Button>
           <Button size="sm" asChild>
             <Link href="/dashboard">Get Started</Link>
           </Button>
