@@ -40,9 +40,9 @@ export function RevisedResume({ markdown }: RevisedResumeProps) {
 
         {/* Resume Preview */}
         <div className="lg:col-span-3">
-          <Card className="border-slate-200 shadow-2xl bg-white relative overflow-hidden print:shadow-none print:border-none">
+          <Card className="border-slate-200 shadow-2xl bg-white relative overflow-hidden print-area">
             <div className="absolute top-0 left-0 w-full h-1 bg-primary print:hidden" />
-            <CardHeader className="p-12 pb-6 print:p-0">
+            <CardHeader className="p-12 pb-6 print:p-8">
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-2xl font-black tracking-tight flex items-center gap-2">
@@ -50,40 +50,19 @@ export function RevisedResume({ markdown }: RevisedResumeProps) {
                     Revised Master Resume
                   </CardTitle>
                   <CardDescription className="text-slate-500 font-medium mt-1 print:hidden">
-                    Validated structural optimization.
+                    Validated structural optimization for enterprise selection.
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-12 pt-0 font-body text-slate-800 print:p-0">
-              <div className="prose prose-slate max-w-none">
-                <div className="whitespace-pre-wrap leading-relaxed text-sm">
+            <CardContent className="p-12 pt-0 font-body text-slate-800 print:p-8 print:pt-0">
+              <div className="max-w-none">
+                <div className="whitespace-pre-wrap leading-relaxed text-sm print:text-xs">
                   {markdown || "Resume generation in progress..."}
                 </div>
               </div>
             </CardContent>
           </Card>
-          
-          {/* Print specific styling for the resume */}
-          <style jsx global>{`
-            @media print {
-              body * {
-                visibility: hidden;
-              }
-              .RevisedResume_resume__print, 
-              .RevisedResume_resume__print * {
-                visibility: visible;
-              }
-              .RevisedResume_resume__print {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-              }
-            }
-          `}</style>
         </div>
       </div>
     </div>
