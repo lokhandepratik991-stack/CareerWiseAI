@@ -54,11 +54,11 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
         title: "Intelligence scan complete",
         description: "Your professional insights have been successfully generated.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Deep analysis failed", error);
       toast({
         title: "Analysis failure",
-        description: "An error occurred during neural processing. Please verify your connection and try again.",
+        description: error.message || "An error occurred during neural processing. Please verify your connection and try again.",
         variant: "destructive",
       });
     } finally {

@@ -4,7 +4,7 @@
  * This includes a professionally revised version of the resume for export.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, defaultModel } from '@/ai/genkit';
 import { z } from 'genkit';
 
 // Re-using existing schemas for consistency with the UI
@@ -74,6 +74,7 @@ export async function performDeepAnalysis(input: DeepAnalysisInput): Promise<Dee
 
 const deepAnalysisPrompt = ai.definePrompt({
   name: 'deepAnalysisPrompt',
+  model: defaultModel,
   input: { schema: DeepAnalysisInputSchema },
   output: { schema: DeepAnalysisOutputSchema },
   prompt: `You are an elite career intelligence system. Perform a comprehensive multidimensional analysis of the provided resume text.
@@ -111,10 +112,17 @@ const deepAnalysisFlow = ai.defineFlow(
       return output;
     } catch (error: any) {
       console.error('Deep Analysis Flow error:', error);
-      if (error.message?.includes('429') || error.message?.includes('quota')) {
+      const message = error.message || '';
+      
+      if (message.includes('429') || message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
         throw new Error('Intelligence quota exceeded. Please wait a few seconds before trying again.');
       }
-      throw new Error(error.message || 'An unexpected error occurred during analysis.');
+      
+      if (message.includes('404') || message.includes('not found')) {
+        throw new Error('Intelligence engine is currently being updated. Please try again in a moment.');
+      }
+      
+      throw new Error(message || 'An unexpected error occurred during analysis.');
     }
   }
 );
