@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A unified Genkit flow that performs a complete, deep analysis of a resume in a single pass.
@@ -123,7 +124,7 @@ const deepAnalysisFlow = ai.defineFlow(
         throw new Error('The intelligence model configuration is being updated. Please try again in a moment.');
       }
       
-      throw new Error(message || 'An unexpected error occurred during analysis.');
+      throw new Error(message || 'An unexpected error occurred during deep analysis.');
     }
   }
 );
