@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { FileUp, Loader2, Sparkles, BrainCircuit, FileText, MousePointer2, AlertCircle } from 'lucide-react';
+import { FileUp, Loader2, Sparkles, BrainCircuit, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,8 +42,12 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
     setIsParsingPDF(true);
     try {
+      // Use dynamic import for the browser-only PDF library
       const pdfjs = await import('pdfjs-dist');
-      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+      
+      // Configure worker from a reliable CDN that matches the library version
+      const workerUrl = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+      pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
@@ -119,7 +123,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           Professional Neural Scan
         </h1>
         <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium">
-          Choose your input method to initialize the algorithmic career audit.
+          Upload your resume PDF or paste your experience manually to begin.
         </p>
       </div>
 
@@ -132,7 +136,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
             <div>
               <CardTitle className="text-xl font-bold tracking-tight">Intelligence Input</CardTitle>
               <CardDescription className="text-sm font-medium text-slate-500 mt-1">
-                Upload a document or paste professional history manually.
+                Choose your preferred input method for analysis.
               </CardDescription>
             </div>
           </div>

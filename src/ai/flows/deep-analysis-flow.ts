@@ -108,7 +108,7 @@ const deepAnalysisFlow = ai.defineFlow(
       
       // Handle model availability or configuration issues
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('Intelligence model configuration issue. Please ensure your API key is active and try again.');
+        throw new Error('Intelligence model configuration issue. Please ensure your API key is active and supports Gemini 1.5 Flash.');
       }
       
       throw new Error(message || 'An unexpected error occurred during deep analysis.');
