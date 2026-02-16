@@ -95,7 +95,7 @@ const deepAnalysisFlow = ai.defineFlow(
     try {
       const { output } = await deepAnalysisPrompt(input);
       if (!output) {
-        throw new Error('Intelligence engine failed to generate content.');
+        throw new Error('Intelligence engine failed to generate response content.');
       }
       return output;
     } catch (error: any) {
@@ -106,9 +106,9 @@ const deepAnalysisFlow = ai.defineFlow(
         throw new Error('Intelligence quota reached. Please wait about 60 seconds before trying again.');
       }
       
-      // Handle model availability
+      // Handle model availability or configuration issues
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('Intelligence service is currently adjusting capacity. Please retry in a few moments.');
+        throw new Error('Intelligence model configuration issue. Please ensure your API key is active and try again.');
       }
       
       throw new Error(message || 'An unexpected error occurred during deep analysis.');

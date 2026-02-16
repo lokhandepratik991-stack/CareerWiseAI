@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { FileText, Loader2, Sparkles, BrainCircuit, Rocket, Zap, Upload, FileUp, MousePointer2 } from 'lucide-react';
+import { FileUp, Loader2, Sparkles, BrainCircuit, FileText, MousePointer2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,7 +43,6 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
     setIsParsingPDF(true);
     try {
       const pdfjs = await import('pdfjs-dist');
-      // Use the correct .mjs worker path for latest pdf.js
       pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
       const arrayBuffer = await file.arrayBuffer();
@@ -64,13 +63,13 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
       setResumeText(fullText.trim());
       toast({
         title: "Extraction Successful",
-        description: "Resume content captured. You can now execute the scan.",
+        description: "Resume content captured from PDF.",
       });
     } catch (error: any) {
       console.error("PDF Parsing error:", error);
       toast({
         title: "Extraction Failed",
-        description: "Failed to parse PDF. Please try pasting manual text.",
+        description: "Failed to parse PDF. Please try pasting text manually.",
         variant: "destructive",
       });
     } finally {
@@ -120,25 +119,31 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           Professional Neural Scan
         </h1>
         <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium">
-          Upload your professional history for deep algorithmic analysis.
+          Choose your input method to initialize the algorithmic career audit.
         </p>
       </div>
 
       <Card className="border border-slate-200 bg-white shadow-2xl rounded-[2rem] overflow-hidden animate-reveal">
         <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-slate-900 p-2 rounded-lg text-white">
-                <BrainCircuit className="h-5 w-5" />
-              </div>
-              <div>
-                <CardTitle className="text-xl font-bold tracking-tight">Intelligence Input</CardTitle>
-                <CardDescription className="text-sm font-medium text-slate-500 mt-1">
-                  Upload a PDF or paste text manually.
-                </CardDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-slate-900 p-2 rounded-lg text-white">
+              <BrainCircuit className="h-5 w-5" />
             </div>
-            <div className="flex items-center gap-3">
+            <div>
+              <CardTitle className="text-xl font-bold tracking-tight">Intelligence Input</CardTitle>
+              <CardDescription className="text-sm font-medium text-slate-500 mt-1">
+                Upload a document or paste professional history manually.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-8">
+          <div className="flex flex-col gap-10">
+            {/* PDF Upload Option */}
+            <div 
+              className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl p-12 bg-slate-50/30 hover:bg-slate-50/60 hover:border-primary/30 transition-all cursor-pointer group"
+              onClick={() => fileInputRef.current?.click()}
+            >
               <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -146,53 +151,73 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
                 accept=".pdf" 
                 className="hidden" 
               />
-              <Button 
-                variant="outline" 
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isParsingPDF || isAnalyzing}
-                className="rounded-full gap-2 text-xs font-black uppercase tracking-widest border-slate-200 shadow-sm px-6 h-11"
-              >
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 {isParsingPDF ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
                 ) : (
-                  <FileUp className="h-3.5 w-3.5" />
+                  <FileUp className="h-8 w-8 text-primary" />
                 )}
-                Upload PDF
-              </Button>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Upload Resume PDF</h3>
+              <p className="text-sm text-slate-500 font-medium">Drop your file here or click to browse</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-4">Max 5MB • Standard Format</p>
+            </div>
+
+            {/* OR Separator */}
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-slate-100"></div>
+              <span className="flex-shrink mx-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">OR</span>
+              <div className="flex-grow border-t border-slate-100"></div>
+            </div>
+
+            {/* Manual Text Input */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400">Manual Content Entry</label>
+                {resumeText.length > 0 && (
+                  <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in">
+                    <Sparkles className="h-3 w-3" />
+                    Content Captured
+                  </span>
+                )}
+              </div>
+              <Textarea 
+                placeholder="Paste your resume content, experience, and skills here..."
+                className="min-h-[300px] resize-none border-slate-200 focus-visible:ring-primary text-base p-8 bg-slate-50/10 rounded-2xl transition-all focus:bg-white"
+                value={resumeText}
+                onChange={(e) => setResumeText(e.target.value)}
+              />
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="p-8">
-          <div className="relative">
-            <Textarea 
-              placeholder="Paste your resume content here..."
-              className="min-h-[400px] resize-none border-slate-200 focus-visible:ring-primary text-base p-8 bg-slate-50/30 rounded-2xl"
-              value={resumeText}
-              onChange={(e) => setResumeText(e.target.value)}
-            />
-          </div>
-          <div className="flex justify-center mt-10">
+
+          <div className="flex justify-center mt-12">
             <Button 
               size="lg" 
               onClick={handleAnalyze} 
               disabled={isAnalyzing || !resumeText.trim()}
-              className="h-16 px-16 text-sm font-black uppercase tracking-widest rounded-full shadow-2xl shadow-primary/30 gap-3 transition-all hover:scale-[1.02]"
+              className="h-16 px-20 text-sm font-black uppercase tracking-widest rounded-full shadow-2xl shadow-primary/30 gap-3 transition-all hover:scale-[1.02] active:scale-95"
             >
               {isAnalyzing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Processing...
+                  Analyzing Potential...
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  Execute Analysis
+                  Execute Deep Scan
                 </>
               )}
             </Button>
           </div>
         </CardContent>
       </Card>
+      
+      {/* Trust Message */}
+      <div className="flex items-center justify-center gap-2 text-slate-400">
+        <AlertCircle className="h-3.5 w-3.5" />
+        <span className="text-[10px] font-bold uppercase tracking-widest">Privacy Protected • Encrypted Intelligence Processing</span>
+      </div>
     </div>
   );
 }
