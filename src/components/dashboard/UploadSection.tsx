@@ -12,9 +12,9 @@ import type { AnalyzeResumeContentOutput } from '@/ai/flows/analyze-resume-conte
 import type { ResumeFeedbackReportOutput } from '@/ai/flows/generate-resume-feedback-report';
 import type { GenerateCareerRecommendationsOutput } from '@/ai/flows/generate-career-recommendations';
 
-// PDF parsing imports
+// PDF parsing imports - Using .mjs for v4+ compatibility
 import * as pdfjs from 'pdfjs-dist';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface UploadSectionProps {
   onResults: (
@@ -48,13 +48,17 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
     setIsParsingPDF(true);
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
       let fullText = '';
       
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        const pageText = textContent.items
+          .filter((item: any) => 'str' in item)
+          .map((item: any) => item.str)
+          .join(' ');
         fullText += pageText + '\n';
       }
 
@@ -63,11 +67,11 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
         title: "PDF Parsed",
         description: "Successfully extracted text from your resume.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("PDF Parsing error:", error);
       toast({
         title: "Parsing failed",
-        description: "Could not extract text from this PDF. Please try pasting the text manually.",
+        description: "Could not extract text from this PDF. This might be due to security restrictions on the worker script. Please try pasting the text manually.",
         variant: "destructive",
       });
     } finally {
@@ -124,7 +128,7 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
           Professional Neural Scan
         </h1>
         <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium">
-          Upload your PDF or paste your professional history for deep algorithmic analysis.
+          Upload your PDF CV or paste your professional history for deep algorithmic analysis.
         </p>
       </div>
 
