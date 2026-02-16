@@ -3,7 +3,7 @@
  * @fileOverview A unified Genkit flow that performs a complete, deep analysis of a resume in a single pass.
  */
 
-import { ai, defaultModel } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const AnalyzeResumeContentOutputSchema = z.object({
@@ -72,7 +72,7 @@ export async function performDeepAnalysis(input: DeepAnalysisInput): Promise<Dee
 
 const deepAnalysisPrompt = ai.definePrompt({
   name: 'deepAnalysisPrompt',
-  model: defaultModel,
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: DeepAnalysisInputSchema },
   output: { schema: DeepAnalysisOutputSchema },
   prompt: `You are an elite career intelligence system. Perform a comprehensive analysis of the provided resume text.
@@ -99,19 +99,20 @@ const deepAnalysisFlow = ai.defineFlow(
       }
       return output;
     } catch (error: any) {
+      console.error("Genkit Error:", error);
       const message = error.message || '';
       
-      // Handle quota issues
+      // Handle quota issues (429)
       if (message.includes('429') || message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
         throw new Error('Intelligence quota reached. Please wait about 60 seconds before trying again.');
       }
       
-      // Handle model availability or configuration issues
+      // Handle model not found (404)
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('Intelligence model configuration issue. Please ensure your API key is active and supports Gemini 1.5 Flash.');
+        throw new Error('The intelligence model is temporarily unavailable or misconfigured. Please check your API key and try again.');
       }
       
-      throw new Error(message || 'An unexpected error occurred during deep analysis.');
+      throw new Error(message || 'An unexpected error occurred during intelligence analysis.');
     }
   }
 );

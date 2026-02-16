@@ -42,10 +42,9 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
 
     setIsParsingPDF(true);
     try {
+      // Use standard CDN import for worker compatibility
       const pdfjs = await import('pdfjs-dist');
-      // Use the stable mjs worker URL
-      const workerUrl = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-      pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
@@ -104,9 +103,10 @@ export function UploadSection({ onResults, onDeepResults }: UploadSectionProps) 
       });
     } catch (error: any) {
       console.error("Analysis failed", error);
+      const message = error.message || "An unexpected error occurred. Please try again.";
       toast({
         title: "Processing Error",
-        description: error.message || "An unexpected error occurred. Please try again.",
+        description: message,
         variant: "destructive",
       });
     } finally {
