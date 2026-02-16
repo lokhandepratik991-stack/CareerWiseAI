@@ -99,18 +99,19 @@ const deepAnalysisFlow = ai.defineFlow(
       }
       return output;
     } catch (error: any) {
-      console.error("Genkit Flow Error:", error);
       const message = error.message || '';
       
+      // Handle quota issues
       if (message.includes('429') || message.includes('quota') || message.includes('RESOURCE_EXHAUSTED')) {
-        throw new Error('Intelligence quota reached. Please wait about 60 seconds.');
+        throw new Error('Intelligence quota reached. Please wait about 60 seconds before trying again.');
       }
       
+      // Handle model availability
       if (message.includes('404') || message.includes('not found')) {
-        throw new Error('Intelligence model configuration issue. Standardizing connection...');
+        throw new Error('Intelligence service is currently adjusting capacity. Please retry in a few moments.');
       }
       
-      throw new Error(message || 'An unexpected error occurred during analysis.');
+      throw new Error(message || 'An unexpected error occurred during deep analysis.');
     }
   }
 );
