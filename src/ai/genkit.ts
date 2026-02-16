@@ -5,4 +5,5 @@ export const ai = genkit({
   plugins: [googleAI()],
 });
 
-export const defaultModel = googleAI.model('gemini-1.5-flash');
+// Using a stable model reference
+export const defaultModel = 'googleai/gemini-1.5-flash';
